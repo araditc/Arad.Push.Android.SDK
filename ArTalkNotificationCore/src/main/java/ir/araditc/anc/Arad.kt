@@ -10,17 +10,18 @@ import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.FirebaseApp
 import com.google.firebase.FirebaseOptions
 import com.google.firebase.messaging.FirebaseMessaging
+import ir.araditc.anc.model.FirebaseConfig
 
 object Arad {
 
-    fun initialize(context: Context) {
+    fun initialize(context: Context , config:FirebaseConfig) {
         val option = FirebaseOptions.Builder()
-            .setApiKey(context.getString(R.string.ApiKey))
-            .setApplicationId(context.getString(R.string.ApplicationId))
-            .setProjectId(context.getString(R.string.ProjectId))
+            .setApiKey(config.ApiKey)
+            .setApplicationId(config.ApplicationId)
+            .setProjectId(config.ProjectId)
             .build();
 
-        val firebaseApp = FirebaseApp.initializeApp(context , option, "Arad_SDK_FCM_OMID_BANK");
+        val firebaseApp = FirebaseApp.initializeApp(context , option, "Arad_SDK_FCM");
 
         val fcmInstance: FirebaseMessaging = firebaseApp.get(FirebaseMessaging::class.java)
 
