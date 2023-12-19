@@ -42,7 +42,7 @@ dependencyResolutionManagement {
 >Add the dependency:
 
 ```groovy
-implementation 'com.github.araditc:Arad.Push.Android.SDK:1.0.6'
+implementation 'com.github.araditc:Arad.Push.Android.SDK:TAG'
 ```
 
 ## Methods
