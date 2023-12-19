@@ -11,11 +11,11 @@ You can use this sdk in Kotlin applications such as **Android**.
 > 2. **Get your Firebase configuration:** After your project is created, click on the gear icon next to **“Project Overview”** and select **“Project settings”**. Here, you’ll find your Firebase SDK snippet under the **“General”** tab. It will look something like this:
 
 >```kotlin
-> class FirebaseConfig = {
->   val ApiKey: String = ""
->   val ApplicationId: String = ""
->   val ProjectId: String = ""
->}
+> data class FirebaseConfig(
+>   var ApiKey: String,
+>   var ApplicationId: String,
+>   var ProjectId: String,
+>)
 >```
 
 ## Installation
