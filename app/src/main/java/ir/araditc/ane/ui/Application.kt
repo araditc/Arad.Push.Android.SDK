@@ -7,6 +7,5 @@ import ir.araditc.anc.model.FirebaseConfig
 class Application : Application() {
     override fun onCreate() {
         super.onCreate()
-        Arad.initialize(this , FirebaseConfig());
     }
 }

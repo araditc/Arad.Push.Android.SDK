@@ -43,3 +43,13 @@ dependencyResolutionManagement {
 ```groovy
 implementation 'com.github.araditc:Arad.Push.Android.SDK:1.0.4'
 ```
+
+## Methods
+
+| Method                                           | Info                                                                       |
+|--------------------------------------------------|----------------------------------------------------------------------------|
+| `init(context: Context , config:FirebaseConfig)` | initialize sdk width `context` (Context) and `firebaseConfig` (object)     |
+| `getToken()`                                     | return firebase token `string` (return `null` before before init complete) |
+| `getPackageName(context)`                        | returns Package Name `string` with (Context)                               |
+| `getDeviceName()`                                | returns Device Name `string`                                               |
+| `getVersion(context)`                            | returns Version `string` with (Context)                                    |

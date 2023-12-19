@@ -5,32 +5,41 @@ import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.os.Build
 import android.text.TextUtils
-import android.util.Log
-import com.google.android.gms.tasks.OnCompleteListener
+import com.google.android.gms.tasks.Tasks
 import com.google.firebase.FirebaseApp
 import com.google.firebase.FirebaseOptions
 import com.google.firebase.messaging.FirebaseMessaging
 import ir.araditc.anc.model.FirebaseConfig
+import java.util.concurrent.ExecutionException
 
-object Arad {
 
-    fun initialize(context: Context , config:FirebaseConfig) {
+object Arad{
+
+    private var firebaseApp: FirebaseApp? = null
+
+    fun init(context: Context , firebaseConfig:FirebaseConfig) {
+
         val option = FirebaseOptions.Builder()
-            .setApiKey(config.ApiKey)
-            .setApplicationId(config.ApplicationId)
-            .setProjectId(config.ProjectId)
+            .setApiKey(firebaseConfig.ApiKey)
+            .setApplicationId(firebaseConfig.ApplicationId)
+            .setProjectId(firebaseConfig.ProjectId)
             .build();
 
-        val firebaseApp = FirebaseApp.initializeApp(context , option, "Arad_SDK_FCM");
+        firebaseApp = FirebaseApp.initializeApp(context , option, "Arad_SDK_FCM");
+    }
 
-        val fcmInstance: FirebaseMessaging = firebaseApp.get(FirebaseMessaging::class.java)
+    fun getToken(): String? {
+        if (firebaseApp == null)
+            return null
 
-        fcmInstance.token.addOnCompleteListener(OnCompleteListener { task ->
-            if (!task.isSuccessful) {
-                return@OnCompleteListener
-            }
-            val token = task.result
-        })
+        val fcmInstance: FirebaseMessaging = firebaseApp!!.get(FirebaseMessaging::class.java)
+
+        val tokenTask = fcmInstance.token
+        return try {
+            Tasks.await(tokenTask)
+        } catch (e: ExecutionException) {
+            throw tokenTask.exception!!
+        }
     }
 
     fun getPackageName(context: Context): String? {
