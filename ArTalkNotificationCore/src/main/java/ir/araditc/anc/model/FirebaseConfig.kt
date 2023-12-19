@@ -1,7 +1,7 @@
 package ir.araditc.anc.model
 
-class FirebaseConfig {
-    val ApiKey: String = ""
-    val ApplicationId: String = ""
-    val ProjectId: String = ""
-}
+data class FirebaseConfig(
+    var ApiKey: String,
+    var ApplicationId: String,
+    var ProjectId: String
+)
