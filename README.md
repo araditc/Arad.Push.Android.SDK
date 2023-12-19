@@ -56,3 +56,10 @@ implementation 'com.github.araditc:Arad.Push.Android.SDK:TAG'
 | `getVersion(context)`                            | returns Version `string` with (Context)                                    |
 | `checkConfig()` | check if configs **defined** and **valid** `boolean`                       |
 | `setConfig()` | **set** connection data `void`                                             |
+
+## Events
+
+| Event              | Info                                         |
+|--------------------|----------------------------------------------|
+| **MessageReceive** | trigger when a message received from server  |
+| **newToken**       | trigger when a new token from fcm            |

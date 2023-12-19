@@ -4,17 +4,24 @@ import android.content.Context
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.os.Build
+import android.os.Message
 import android.text.TextUtils
 import com.google.android.gms.tasks.Tasks
 import com.google.firebase.FirebaseApp
 import com.google.firebase.FirebaseOptions
 import com.google.firebase.messaging.FirebaseMessaging
+import ir.araditc.anc.data.local.IToken
+import ir.araditc.anc.data.local.IMessage
 import ir.araditc.anc.data.local.SecureSharedPrefs
 import ir.araditc.anc.model.FirebaseConfig
 import java.util.concurrent.ExecutionException
 
 
 object Arad {
+
+    private var iMessage: IMessage? = null
+
+    private var iToken: IToken? = null
 
     private var firebaseApp: FirebaseApp? = null
 
@@ -109,5 +116,25 @@ object Arad {
             e.printStackTrace()
         }
         return version
+    }
+
+    fun setIMessage(ob: IMessage) {
+        iMessage = ob
+    }
+
+    fun SetIToken(ob: IToken) {
+        iToken = ob;
+    }
+
+    fun setMessage(message: String) {
+        if (iMessage != null) {
+            iMessage!!.MessageReceive(message)
+        }
+    }
+
+    fun setToken(token: String) {
+        if (iToken != null) {
+            iToken!!.newToken(token)
+        }
     }
 }
