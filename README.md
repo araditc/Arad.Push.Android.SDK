@@ -54,3 +54,5 @@ implementation 'com.github.araditc:Arad.Push.Android.SDK:1.0.6'
 | `getPackageName(context)`                        | returns Package Name `string` with (Context)                               |
 | `getDeviceName()`                                | returns Device Name `string`                                               |
 | `getVersion(context)`                            | returns Version `string` with (Context)                                    |
+| `checkConfig()` | check if configs **defined** and **valid** `boolean`                       |
+| `setConfig()` | **set** connection data `void`                                             |
