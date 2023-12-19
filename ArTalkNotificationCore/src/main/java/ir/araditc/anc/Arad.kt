@@ -9,28 +9,26 @@ import com.google.android.gms.tasks.Tasks
 import com.google.firebase.FirebaseApp
 import com.google.firebase.FirebaseOptions
 import com.google.firebase.messaging.FirebaseMessaging
+import ir.araditc.anc.data.local.SecureSharedPrefs
 import ir.araditc.anc.model.FirebaseConfig
 import java.util.concurrent.ExecutionException
 
 
-object Arad{
+object Arad {
 
     private var firebaseApp: FirebaseApp? = null
 
-    fun init(context: Context , firebaseConfig:FirebaseConfig) {
+    fun init(context: Context, firebaseConfig: FirebaseConfig) {
 
-        val option = FirebaseOptions.Builder()
-            .setApiKey(firebaseConfig.ApiKey)
-            .setApplicationId(firebaseConfig.ApplicationId)
-            .setProjectId(firebaseConfig.ProjectId)
+        val option = FirebaseOptions.Builder().setApiKey(firebaseConfig.ApiKey)
+            .setApplicationId(firebaseConfig.ApplicationId).setProjectId(firebaseConfig.ProjectId)
             .build();
 
-        firebaseApp = FirebaseApp.initializeApp(context , option, "Arad_SDK_FCM");
+        firebaseApp = FirebaseApp.initializeApp(context, option, "Arad_SDK_FCM");
     }
 
     fun getToken(): String? {
-        if (firebaseApp == null)
-            return null
+        if (firebaseApp == null) return null
 
         val fcmInstance: FirebaseMessaging = firebaseApp!!.get(FirebaseMessaging::class.java)
 
@@ -40,6 +38,28 @@ object Arad{
         } catch (e: ExecutionException) {
             throw tokenTask.exception!!
         }
+    }
+
+    fun setConfig(
+        context: Context,
+        appPackageName: String,
+        clientUserName: String,
+        clientPassword: String,
+        connectionURL: String
+    ) {
+        val sharedPreferences = SecureSharedPrefs.getSharedPreferences(context, appPackageName)
+        val editor = sharedPreferences.edit()
+        editor.putString("clientUserName", clientUserName)
+        editor.putString("clientPassword", clientPassword)
+        editor.putString("connectionURL", connectionURL)
+        editor.apply()
+    }
+
+    fun checkConfig(context: Context, appPackageName: String): Boolean {
+        val sharedPreferences = SecureSharedPrefs.getSharedPreferences(context, appPackageName)
+        val connectionUrl = sharedPreferences.getString("connectionURL", "")
+
+        return !connectionUrl.equals("")
     }
 
     fun getPackageName(context: Context): String? {
