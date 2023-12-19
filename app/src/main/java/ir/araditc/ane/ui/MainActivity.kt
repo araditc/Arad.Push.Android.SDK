@@ -7,5 +7,6 @@ import ir.araditc.anc.Arad
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        // Example
     }
 }
