@@ -1,11 +1,9 @@
 package ir.araditc.anc.service
 
-import android.content.Context
-import android.util.Log
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
-import info.mqtt.android.service.MqttAndroidClient
-import info.mqtt.android.service.QoS
+//import info.mqtt.android.service.MqttAndroidClient
+//import info.mqtt.android.service.QoS
 import ir.araditc.anc.Arad
 import ir.araditc.anc.data.local.SecureSharedPrefs
 //import org.eclipse.paho.client.mqttv3.DisconnectedBufferOptions
@@ -19,7 +17,7 @@ import java.util.UUID
 
 class FirebaseMessagingService : FirebaseMessagingService() {
 
-    private lateinit var mqttAndroidClient: MqttAndroidClient
+//    private lateinit var mqttAndroidClient: MqttAndroidClient
 
     companion object {
         const val TAG = "APN"
