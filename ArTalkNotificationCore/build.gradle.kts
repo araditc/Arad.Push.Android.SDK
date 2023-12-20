@@ -40,8 +40,8 @@ dependencies {
     implementation("com.google.android.material:material:1.11.0")
     //implementation(files("libs/serviceLibrary-release.aar"))
 
-    configurations.maybeCreate("default")
-    artifacts.add("default", file("serviceLibrary-release.aar"))
+//    configurations.maybeCreate("default")
+//    artifacts.add("default", file("serviceLibrary-release.aar"))
 
     implementation(platform("com.google.firebase:firebase-bom:32.7.0"))
     implementation("com.google.firebase:firebase-messaging:23.4.0")
