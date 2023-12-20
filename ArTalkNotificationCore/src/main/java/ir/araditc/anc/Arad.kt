@@ -54,16 +54,16 @@ object Arad {
         clientPassword: String,
         connectionURL: String
     ) {
-        val sharedPreferences = SecureSharedPrefs.getSharedPreferences(context, appPackageName)
+        val sharedPreferences = SecureSharedPrefs.getSharedPreferences(context)
         val editor = sharedPreferences.edit()
         editor.putString("clientUserName", clientUserName)
         editor.putString("clientPassword", clientPassword)
-        editor.putString("connectionURL", connectionURL)
+        editor.putString("connectionURL", "tcp://$connectionURL:1883")
         editor.apply()
     }
 
     fun checkConfig(context: Context, appPackageName: String): Boolean {
-        val sharedPreferences = SecureSharedPrefs.getSharedPreferences(context, appPackageName)
+        val sharedPreferences = SecureSharedPrefs.getSharedPreferences(context)
         val connectionUrl = sharedPreferences.getString("connectionURL", "")
 
         return !connectionUrl.equals("")
@@ -126,9 +126,9 @@ object Arad {
         iToken = ob;
     }
 
-    fun setMessage(message: String) {
+    fun setMessage(title: String, content: String, payload: String) {
         if (iMessage != null) {
-            iMessage!!.MessageReceive(message)
+            iMessage!!.MessageReceive(title , content , payload)
         }
     }
 
