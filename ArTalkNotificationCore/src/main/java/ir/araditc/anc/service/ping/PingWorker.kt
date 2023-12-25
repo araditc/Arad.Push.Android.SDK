@@ -1,26 +1,27 @@
 package ir.araditc.anc.service.ping
 
 import android.content.Context
+import android.util.Log
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import kotlinx.coroutines.suspendCancellableCoroutine
 import org.eclipse.paho.client.mqttv3.IMqttActionListener
 import org.eclipse.paho.client.mqttv3.IMqttToken
-import timber.log.Timber
 import kotlin.coroutines.resume
 
 class PingWorker(context: Context, workerParams: WorkerParameters) :
     CoroutineWorker(context, workerParams) {
+    private val TAG = "APN"
     override suspend fun doWork(): Result = suspendCancellableCoroutine { continuation ->
-        Timber.d("Sending Ping at: ${System.currentTimeMillis()}")
+        Log.i(TAG, "Sending Ping at: ${System.currentTimeMillis()}")
         AlarmPingSender.clientComms?.checkForActivity(object : IMqttActionListener {
             override fun onSuccess(asyncActionToken: IMqttToken?) {
-                Timber.d("Success.")
+                Log.i(TAG, "Success.")
                 continuation.resume(Result.success())
             }
 
             override fun onFailure(asyncActionToken: IMqttToken?, exception: Throwable?) {
-                Timber.e("Failure $exception")
+                Log.i(TAG, "Failure $exception")
                 continuation.resume(Result.failure())
             }
         }) ?: kotlin.run {

@@ -13,6 +13,7 @@ import android.os.Build
 import android.os.Bundle
 import android.os.IBinder
 import android.os.PowerManager
+import android.util.Log
 import info.mqtt.android.service.MqttConnection
 import ir.araditc.anc.service.room.MqMessageDatabase
 import kotlinx.coroutines.CoroutineScope
@@ -22,7 +23,6 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
 import org.eclipse.paho.client.mqttv3.*
-import timber.log.Timber
 import java.util.concurrent.ConcurrentHashMap
 
 /**
@@ -180,6 +180,8 @@ import java.util.concurrent.ConcurrentHashMap
  */
 @SuppressLint("Registered")
 class MqttService : Service(), MqttTraceHandler {
+    private val TAG = "APN"
+
     // mapping from client handle strings to actual client connections.
     internal val connections: MutableMap<String, MqttConnection> = ConcurrentHashMap()
 
@@ -213,7 +215,7 @@ class MqttService : Service(), MqttTraceHandler {
     }
 
     override fun onDestroy() {
-        Timber.i("Destroy service")
+        Log.i(TAG, "Destroy service")
         for (client in connections.values) {
             client.disconnect(null, null)
         }

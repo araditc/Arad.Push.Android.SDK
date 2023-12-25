@@ -1,10 +1,10 @@
 package ir.araditc.anc.service.ping
 
+import android.util.Log
 import androidx.work.*
 import ir.araditc.anc.service.MqttService
 import org.eclipse.paho.client.mqttv3.MqttPingSender
 import org.eclipse.paho.client.mqttv3.internal.ClientComms
-import timber.log.Timber
 import java.util.concurrent.TimeUnit
 
 
@@ -17,6 +17,8 @@ import java.util.concurrent.TimeUnit
  * @see MqttPingSender
  */
 internal class AlarmPingSender(val service: MqttService) : MqttPingSender {
+
+    private val TAG = "APN"
 
     private val workManager = WorkManager.getInstance(service)
 
@@ -33,14 +35,12 @@ internal class AlarmPingSender(val service: MqttService) : MqttPingSender {
     }
 
     override fun schedule(delayInMilliseconds: Long) {
-        Timber.d("Schedule next alarm at ${System.currentTimeMillis() + delayInMilliseconds}")
+        Log.i(TAG, "Schedule next alarm at ${System.currentTimeMillis() + delayInMilliseconds}")
         workManager.enqueueUniqueWork(
             PING_JOB,
             ExistingWorkPolicy.REPLACE,
-            OneTimeWorkRequest
-                .Builder(PingWorker::class.java)
-                .setInitialDelay(delayInMilliseconds, TimeUnit.MILLISECONDS)
-                .build()
+            OneTimeWorkRequest.Builder(PingWorker::class.java)
+                .setInitialDelay(delayInMilliseconds, TimeUnit.MILLISECONDS).build()
         )
     }
 

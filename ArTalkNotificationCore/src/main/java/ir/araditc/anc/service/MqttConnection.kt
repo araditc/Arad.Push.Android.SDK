@@ -18,7 +18,6 @@ import kotlinx.coroutines.launch
 import org.eclipse.paho.client.mqttv3.*
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence
 import org.eclipse.paho.client.mqttv3.persist.MqttDefaultFilePersistence
-import timber.log.Timber
 import java.io.File
 import java.util.*
 
@@ -58,6 +57,8 @@ internal class MqttConnection(
     private var persistence: MqttClientPersistence?, // Client handle, used for callbacks...
     var clientHandle: String
 ) : MqttCallbackExtended {
+    private val TAG = "APN"
+
     // Saved sent messages and their corresponding Topics, activityTokens and
     // invocationContexts, so we can handle "deliveryComplete" callbacks from the mqttClient
     private val savedTopics: MutableMap<IMqttDeliveryToken?, String> = HashMap()
@@ -99,19 +100,19 @@ internal class MqttConnection(
             cleanSession = it.isCleanSession
             if (it.isCleanSession) { // if it's a clean session,
                 // discard old data
-                if (service.messageDatabase.isOpen)
-                    CoroutineScope(Dispatchers.IO).launch {
-                        service.messageDatabase.persistenceDao().deleteClientHandle(clientHandle)
-                    }
-                else
-                    Timber.w("Database is closed")
+                if (service.messageDatabase.isOpen) CoroutineScope(Dispatchers.IO).launch {
+                    service.messageDatabase.persistenceDao().deleteClientHandle(clientHandle)
+                }
+                else Log.i(TAG, "Database is closed")
             }
         }
         service.traceDebug("Connecting {$serverURI} as {$clientId}")
         val resultBundle = Bundle()
         resultBundle.putString(MqttServiceConstants.CALLBACK_ACTIVITY_TOKEN, activityToken)
         resultBundle.putString(MqttServiceConstants.CALLBACK_INVOCATION_CONTEXT, invocationContext)
-        resultBundle.putString(MqttServiceConstants.CALLBACK_ACTION, MqttServiceConstants.CONNECT_ACTION)
+        resultBundle.putString(
+            MqttServiceConstants.CALLBACK_ACTION, MqttServiceConstants.CONNECT_ACTION
+        )
         try {
             if (persistence == null) {
                 // ask Android where we can put files
@@ -144,13 +145,17 @@ internal class MqttConnection(
             }
             val listener: IMqttActionListener = object : MqttConnectionListener(resultBundle) {
                 override fun onSuccess(asyncActionToken: IMqttToken) {
-                    resultBundle.putBoolean(MqttServiceConstants.SESSION_PRESENT, asyncActionToken.sessionPresent)
+                    resultBundle.putBoolean(
+                        MqttServiceConstants.SESSION_PRESENT, asyncActionToken.sessionPresent
+                    )
                     doAfterConnectSuccess(resultBundle)
                     service.traceDebug("connect success!")
                 }
 
                 override fun onFailure(asyncActionToken: IMqttToken?, exception: Throwable?) {
-                    resultBundle.putString(MqttServiceConstants.CALLBACK_ERROR_MESSAGE, exception?.localizedMessage)
+                    resultBundle.putString(
+                        MqttServiceConstants.CALLBACK_ERROR_MESSAGE, exception?.localizedMessage
+                    )
                     resultBundle.putSerializable(MqttServiceConstants.CALLBACK_EXCEPTION, exception)
                     service.traceError("connect fail, call connect to reconnect.reason: ${exception?.message}")
                     doAfterConnectFail(resultBundle)
@@ -197,7 +202,9 @@ internal class MqttConnection(
 
     override fun connectComplete(reconnect: Boolean, serverURI: String) {
         val resultBundle = Bundle()
-        resultBundle.putString(MqttServiceConstants.CALLBACK_ACTION, MqttServiceConstants.CONNECT_EXTENDED_ACTION)
+        resultBundle.putString(
+            MqttServiceConstants.CALLBACK_ACTION, MqttServiceConstants.CONNECT_EXTENDED_ACTION
+        )
         resultBundle.putBoolean(MqttServiceConstants.CALLBACK_RECONNECT, reconnect)
         resultBundle.putString(MqttServiceConstants.CALLBACK_SERVER_URI, serverURI)
         service.callbackToActivity(clientHandle, Status.OK, resultBundle)
@@ -226,7 +233,10 @@ internal class MqttConnection(
         CoroutineScope(Dispatchers.IO).launch {
             service.messageDatabase.persistenceDao().allArrived(clientHandle).forEach {
                 val resultBundle = messageToBundle(it.messageId, it.topic, it.mqttMessage)
-                resultBundle.putString(MqttServiceConstants.CALLBACK_ACTION, MqttServiceConstants.MESSAGE_ARRIVED_ACTION)
+                resultBundle.putString(
+                    MqttServiceConstants.CALLBACK_ACTION,
+                    MqttServiceConstants.MESSAGE_ARRIVED_ACTION
+                )
                 service.callbackToActivity(clientHandle, Status.OK, resultBundle)
             }
         }
@@ -245,7 +255,9 @@ internal class MqttConnection(
         val result = Bundle()
         result.putString(MqttServiceConstants.CALLBACK_MESSAGE_ID, messageId)
         result.putString(MqttServiceConstants.CALLBACK_DESTINATION_NAME, topic)
-        result.putParcelable(MqttServiceConstants.CALLBACK_MESSAGE_PARCEL, ParcelableMqttMessage(message))
+        result.putParcelable(
+            MqttServiceConstants.CALLBACK_MESSAGE_PARCEL, ParcelableMqttMessage(message)
+        )
         return result
     }
 
@@ -275,7 +287,9 @@ internal class MqttConnection(
         val resultBundle = Bundle()
         resultBundle.putString(MqttServiceConstants.CALLBACK_ACTIVITY_TOKEN, activityToken)
         resultBundle.putString(MqttServiceConstants.CALLBACK_INVOCATION_CONTEXT, invocationContext)
-        resultBundle.putString(MqttServiceConstants.CALLBACK_ACTION, MqttServiceConstants.DISCONNECT_ACTION)
+        resultBundle.putString(
+            MqttServiceConstants.CALLBACK_ACTION, MqttServiceConstants.DISCONNECT_ACTION
+        )
         if (myClient != null && myClient!!.isConnected) {
             val listener: IMqttActionListener = MqttConnectionListener(resultBundle)
             try {
@@ -309,7 +323,9 @@ internal class MqttConnection(
         val resultBundle = Bundle()
         resultBundle.putString(MqttServiceConstants.CALLBACK_ACTIVITY_TOKEN, activityToken)
         resultBundle.putString(MqttServiceConstants.CALLBACK_INVOCATION_CONTEXT, invocationContext)
-        resultBundle.putString(MqttServiceConstants.CALLBACK_ACTION, MqttServiceConstants.DISCONNECT_ACTION)
+        resultBundle.putString(
+            MqttServiceConstants.CALLBACK_ACTION, MqttServiceConstants.DISCONNECT_ACTION
+        )
         if (myClient != null && myClient!!.isConnected) {
             val listener: IMqttActionListener = MqttConnectionListener(resultBundle)
             try {
@@ -358,7 +374,9 @@ internal class MqttConnection(
         activityToken: String
     ): IMqttDeliveryToken? {
         val resultBundle = Bundle()
-        resultBundle.putString(MqttServiceConstants.CALLBACK_ACTION, MqttServiceConstants.SEND_ACTION)
+        resultBundle.putString(
+            MqttServiceConstants.CALLBACK_ACTION, MqttServiceConstants.SEND_ACTION
+        )
         resultBundle.putString(MqttServiceConstants.CALLBACK_ACTIVITY_TOKEN, activityToken)
         resultBundle.putString(MqttServiceConstants.CALLBACK_INVOCATION_CONTEXT, invocationContext)
         var sendToken: IMqttDeliveryToken? = null
@@ -368,7 +386,9 @@ internal class MqttConnection(
                 val message = MqttMessage(payload)
                 message.qos = qos.value
                 message.isRetained = retained
-                sendToken = myClient!!.publish(topic, payload, qos.value, retained, invocationContext, listener)
+                sendToken = myClient!!.publish(
+                    topic, payload, qos.value, retained, invocationContext, listener
+                )
                 storeSendDetails(topic, message, sendToken, invocationContext, activityToken)
             } catch (e: Exception) {
                 handleException(resultBundle, e)
@@ -391,9 +411,13 @@ internal class MqttConnection(
      * @param activityToken     arbitrary string to be passed back to the activity
      * @return token for tracking the operation
      */
-    fun publish(topic: String, message: MqttMessage, invocationContext: String?, activityToken: String): IMqttDeliveryToken? {
+    fun publish(
+        topic: String, message: MqttMessage, invocationContext: String?, activityToken: String
+    ): IMqttDeliveryToken? {
         val resultBundle = Bundle()
-        resultBundle.putString(MqttServiceConstants.CALLBACK_ACTION, MqttServiceConstants.SEND_ACTION)
+        resultBundle.putString(
+            MqttServiceConstants.CALLBACK_ACTION, MqttServiceConstants.SEND_ACTION
+        )
         resultBundle.putString(MqttServiceConstants.CALLBACK_ACTIVITY_TOKEN, activityToken)
         resultBundle.putString(MqttServiceConstants.CALLBACK_INVOCATION_CONTEXT, invocationContext)
         var sendToken: IMqttDeliveryToken? = null
@@ -415,7 +439,7 @@ internal class MqttConnection(
                 handleException(resultBundle, e)
             }
         } else {
-            Timber.i("Client is not connected, so not sending message")
+            Log.i(TAG, "Client is not connected, so not sending message")
             resultBundle.putString(MqttServiceConstants.CALLBACK_ERROR_MESSAGE, NOT_CONNECTED)
             service.traceError(MqttServiceConstants.SEND_ACTION + " " + NOT_CONNECTED)
             service.callbackToActivity(clientHandle, Status.ERROR, resultBundle)
@@ -434,7 +458,9 @@ internal class MqttConnection(
     fun subscribe(topic: String, qos: QoS, invocationContext: String?, activityToken: String) {
         service.traceDebug("subscribe({$topic},$qos,{$invocationContext}, {$activityToken}")
         val resultBundle = Bundle()
-        resultBundle.putString(MqttServiceConstants.CALLBACK_ACTION, MqttServiceConstants.SUBSCRIBE_ACTION)
+        resultBundle.putString(
+            MqttServiceConstants.CALLBACK_ACTION, MqttServiceConstants.SUBSCRIBE_ACTION
+        )
         resultBundle.putString(MqttServiceConstants.CALLBACK_ACTIVITY_TOKEN, activityToken)
         resultBundle.putString(MqttServiceConstants.CALLBACK_INVOCATION_CONTEXT, invocationContext)
         if (myClient != null && myClient!!.isConnected) {
@@ -459,13 +485,16 @@ internal class MqttConnection(
      * @param invocationContext arbitrary data to be passed back to the application
      * @param activityToken     arbitrary identifier to be passed back to the Activity
      */
-    fun subscribe(topic: Array<String>, qos: IntArray?, invocationContext: String?, activityToken: String) {
+    fun subscribe(
+        topic: Array<String>, qos: IntArray?, invocationContext: String?, activityToken: String
+    ) {
         service.traceDebug(
-            "subscribe({" + topic.contentToString() + "}," + Arrays
-                .toString(qos) + ",{" + invocationContext + "}, {" + activityToken + "}"
+            "subscribe({" + topic.contentToString() + "}," + Arrays.toString(qos) + ",{" + invocationContext + "}, {" + activityToken + "}"
         )
         val resultBundle = Bundle()
-        resultBundle.putString(MqttServiceConstants.CALLBACK_ACTION, MqttServiceConstants.SUBSCRIBE_ACTION)
+        resultBundle.putString(
+            MqttServiceConstants.CALLBACK_ACTION, MqttServiceConstants.SUBSCRIBE_ACTION
+        )
         resultBundle.putString(MqttServiceConstants.CALLBACK_ACTIVITY_TOKEN, activityToken)
         resultBundle.putString(MqttServiceConstants.CALLBACK_INVOCATION_CONTEXT, invocationContext)
         if (myClient != null && myClient!!.isConnected) {
@@ -490,17 +519,24 @@ internal class MqttConnection(
         messageListeners: Array<IMqttMessageListener>?
     ) {
         service.traceDebug(
-            "subscribe({" + topicFilters.contentToString() + "}," + qos.contentToString() + ",{" +
-                    invocationContext + "}, {" + activityToken + "}"
+            "subscribe({" + topicFilters.contentToString() + "}," + qos.contentToString() + ",{" + invocationContext + "}, {" + activityToken + "}"
         )
         val resultBundle = Bundle()
-        resultBundle.putString(MqttServiceConstants.CALLBACK_ACTION, MqttServiceConstants.SUBSCRIBE_ACTION)
+        resultBundle.putString(
+            MqttServiceConstants.CALLBACK_ACTION, MqttServiceConstants.SUBSCRIBE_ACTION
+        )
         resultBundle.putString(MqttServiceConstants.CALLBACK_ACTIVITY_TOKEN, activityToken)
         resultBundle.putString(MqttServiceConstants.CALLBACK_INVOCATION_CONTEXT, invocationContext)
         if (myClient != null && myClient!!.isConnected) {
             val listener: IMqttActionListener = MqttConnectionListener(resultBundle)
             try {
-                myClient!!.subscribe(topicFilters, qos.map { it.value }.toIntArray(), null, listener, messageListeners)
+                myClient!!.subscribe(
+                    topicFilters,
+                    qos.map { it.value }.toIntArray(),
+                    null,
+                    listener,
+                    messageListeners
+                )
             } catch (e: Exception) {
                 handleException(resultBundle, e)
             }
@@ -521,7 +557,9 @@ internal class MqttConnection(
     fun unsubscribe(topic: String, invocationContext: String?, activityToken: String) {
         service.traceDebug("unsubscribe({$topic},{$invocationContext}, {$activityToken})")
         val resultBundle = Bundle()
-        resultBundle.putString(MqttServiceConstants.CALLBACK_ACTION, MqttServiceConstants.UNSUBSCRIBE_ACTION)
+        resultBundle.putString(
+            MqttServiceConstants.CALLBACK_ACTION, MqttServiceConstants.UNSUBSCRIBE_ACTION
+        )
         resultBundle.putString(MqttServiceConstants.CALLBACK_ACTIVITY_TOKEN, activityToken)
         resultBundle.putString(MqttServiceConstants.CALLBACK_INVOCATION_CONTEXT, invocationContext)
         if (myClient != null && myClient!!.isConnected) {
@@ -548,7 +586,9 @@ internal class MqttConnection(
     fun unsubscribe(topic: Array<String>, invocationContext: String?, activityToken: String) {
         service.traceDebug("unsubscribe({" + topic.contentToString() + "},{" + invocationContext + "}, {" + activityToken + "})")
         val resultBundle = Bundle()
-        resultBundle.putString(MqttServiceConstants.CALLBACK_ACTION, MqttServiceConstants.UNSUBSCRIBE_ACTION)
+        resultBundle.putString(
+            MqttServiceConstants.CALLBACK_ACTION, MqttServiceConstants.UNSUBSCRIBE_ACTION
+        )
         resultBundle.putString(MqttServiceConstants.CALLBACK_ACTIVITY_TOKEN, activityToken)
         resultBundle.putString(MqttServiceConstants.CALLBACK_INVOCATION_CONTEXT, invocationContext)
         if (myClient != null && myClient!!.isConnected) {
@@ -590,7 +630,8 @@ internal class MqttConnection(
                 myClient!!.disconnect(null, object : IMqttActionListener {
                     override fun onSuccess(asyncActionToken: IMqttToken) = Unit
 
-                    override fun onFailure(asyncActionToken: IMqttToken?, exception: Throwable?) = Unit
+                    override fun onFailure(asyncActionToken: IMqttToken?, exception: Throwable?) =
+                        Unit
                 })
             } else {
                 // Using the new Automatic reconnect functionality.
@@ -601,13 +642,17 @@ internal class MqttConnection(
             // ignore it - we've done our best
         }
         val resultBundle = Bundle()
-        resultBundle.putString(MqttServiceConstants.CALLBACK_ACTION, MqttServiceConstants.ON_CONNECTION_LOST_ACTION)
+        resultBundle.putString(
+            MqttServiceConstants.CALLBACK_ACTION, MqttServiceConstants.ON_CONNECTION_LOST_ACTION
+        )
         if (why != null) {
             resultBundle.putString(MqttServiceConstants.CALLBACK_ERROR_MESSAGE, why.message)
             if (why is MqttException) {
                 resultBundle.putSerializable(MqttServiceConstants.CALLBACK_EXCEPTION, why)
             }
-            resultBundle.putString(MqttServiceConstants.CALLBACK_EXCEPTION_STACK, Log.getStackTraceString(why))
+            resultBundle.putString(
+                MqttServiceConstants.CALLBACK_EXCEPTION_STACK, Log.getStackTraceString(why)
+            )
         }
         service.callbackToActivity(clientHandle, Status.OK, resultBundle)
         // client has lost connection no need for wake lock
@@ -627,7 +672,9 @@ internal class MqttConnection(
             if (MqttServiceConstants.SEND_ACTION == resultBundle.getString(MqttServiceConstants.CALLBACK_ACTION)) {
                 service.callbackToActivity(clientHandle, Status.OK, resultBundle)
             }
-            resultBundle.putString(MqttServiceConstants.CALLBACK_ACTION, MqttServiceConstants.MESSAGE_DELIVERED_ACTION)
+            resultBundle.putString(
+                MqttServiceConstants.CALLBACK_ACTION, MqttServiceConstants.MESSAGE_DELIVERED_ACTION
+            )
             service.callbackToActivity(clientHandle, Status.OK, resultBundle)
         }
 
@@ -644,7 +691,9 @@ internal class MqttConnection(
         service.traceDebug("messageArrived($topic,{$message})")
         val messageId = service.messageDatabase.storeArrived(clientHandle, topic, message)
         val resultBundle = messageToBundle(messageId, topic, message)
-        resultBundle.putString(MqttServiceConstants.CALLBACK_ACTION, MqttServiceConstants.MESSAGE_ARRIVED_ACTION)
+        resultBundle.putString(
+            MqttServiceConstants.CALLBACK_ACTION, MqttServiceConstants.MESSAGE_ARRIVED_ACTION
+        )
         resultBundle.putString(MqttServiceConstants.CALLBACK_MESSAGE_ID, messageId)
         service.callbackToActivity(clientHandle, Status.OK, resultBundle)
     }
@@ -663,9 +712,13 @@ internal class MqttConnection(
             val invocationContext = savedInvocationContexts.remove(messageToken)
             val resultBundle = messageToBundle(null, topic, message)
             if (activityToken != null) {
-                resultBundle.putString(MqttServiceConstants.CALLBACK_ACTION, MqttServiceConstants.SEND_ACTION)
+                resultBundle.putString(
+                    MqttServiceConstants.CALLBACK_ACTION, MqttServiceConstants.SEND_ACTION
+                )
                 resultBundle.putString(MqttServiceConstants.CALLBACK_ACTIVITY_TOKEN, activityToken)
-                resultBundle.putString(MqttServiceConstants.CALLBACK_INVOCATION_CONTEXT, invocationContext)
+                resultBundle.putString(
+                    MqttServiceConstants.CALLBACK_INVOCATION_CONTEXT, invocationContext
+                )
             }
             return resultBundle
         }
@@ -678,8 +731,11 @@ internal class MqttConnection(
      */
     @Synchronized
     private fun storeSendDetails(
-        topic: String, msg: MqttMessage, messageToken: IMqttDeliveryToken?,
-        invocationContext: String?, activityToken: String
+        topic: String,
+        msg: MqttMessage,
+        messageToken: IMqttDeliveryToken?,
+        invocationContext: String?,
+        activityToken: String
     ) {
         savedTopics[messageToken] = topic
         savedSentMessages[messageToken] = msg
@@ -743,17 +799,21 @@ internal class MqttConnection(
         }
         if (connectOptions!!.isAutomaticReconnect) {
             //The Automatic reconnect functionality is enabled here
-            Timber.i("Requesting Automatic reconnect using New Java AC")
+            Log.i(TAG, "Requesting Automatic reconnect using New Java AC")
             val resultBundle = Bundle()
-            resultBundle.putString(MqttServiceConstants.CALLBACK_ACTIVITY_TOKEN, reconnectActivityToken)
+            resultBundle.putString(
+                MqttServiceConstants.CALLBACK_ACTIVITY_TOKEN, reconnectActivityToken
+            )
             resultBundle.putString(MqttServiceConstants.CALLBACK_INVOCATION_CONTEXT, null)
-            resultBundle.putString(MqttServiceConstants.CALLBACK_ACTION, MqttServiceConstants.CONNECT_ACTION)
+            resultBundle.putString(
+                MqttServiceConstants.CALLBACK_ACTION, MqttServiceConstants.CONNECT_ACTION
+            )
             CoroutineScope(Dispatchers.IO).launch {
                 try {
                     myClient!!.reconnect()
                 } catch (ex: MqttException) {
                     CoroutineScope(Dispatchers.Main).launch {
-                        Timber.e(ex, "Exception occurred attempting to reconnect: ${ex.message}")
+                        Log.i(TAG, "Exception occurred attempting to reconnect: ${ex.message}")
                         setConnectingState(false)
                         handleException(resultBundle, ex)
                     }
@@ -763,22 +823,32 @@ internal class MqttConnection(
             // use the activityToke the same with action connect
             service.traceDebug("Do Real Reconnect!")
             val resultBundle = Bundle()
-            resultBundle.putString(MqttServiceConstants.CALLBACK_ACTIVITY_TOKEN, reconnectActivityToken)
+            resultBundle.putString(
+                MqttServiceConstants.CALLBACK_ACTIVITY_TOKEN, reconnectActivityToken
+            )
             resultBundle.putString(MqttServiceConstants.CALLBACK_INVOCATION_CONTEXT, null)
-            resultBundle.putString(MqttServiceConstants.CALLBACK_ACTION, MqttServiceConstants.CONNECT_ACTION)
+            resultBundle.putString(
+                MqttServiceConstants.CALLBACK_ACTION, MqttServiceConstants.CONNECT_ACTION
+            )
             try {
                 val listener: IMqttActionListener = object : MqttConnectionListener(resultBundle) {
                     override fun onSuccess(asyncActionToken: IMqttToken) {
                         // since the device's cpu can go to sleep, acquire a wakelock and drop it later.
                         service.traceDebug("Reconnect Success!")
                         service.traceDebug("DeliverBacklog when reconnect.")
-                        resultBundle.putBoolean(MqttServiceConstants.SESSION_PRESENT, asyncActionToken.sessionPresent)
+                        resultBundle.putBoolean(
+                            MqttServiceConstants.SESSION_PRESENT, asyncActionToken.sessionPresent
+                        )
                         doAfterConnectSuccess(resultBundle)
                     }
 
                     override fun onFailure(asyncActionToken: IMqttToken?, exception: Throwable?) {
-                        resultBundle.putString(MqttServiceConstants.CALLBACK_ERROR_MESSAGE, exception?.localizedMessage)
-                        resultBundle.putSerializable(MqttServiceConstants.CALLBACK_EXCEPTION, exception)
+                        resultBundle.putString(
+                            MqttServiceConstants.CALLBACK_ERROR_MESSAGE, exception?.localizedMessage
+                        )
+                        resultBundle.putSerializable(
+                            MqttServiceConstants.CALLBACK_EXCEPTION, exception
+                        )
                         service.callbackToActivity(clientHandle, Status.ERROR, resultBundle)
                         doAfterConnectFail(resultBundle)
                     }
@@ -789,8 +859,7 @@ internal class MqttConnection(
                 service.traceError("Cannot reconnect to remote server." + e.message)
                 setConnectingState(false)
                 handleException(resultBundle, e)
-            } catch (e: Exception) {
-                /*  TODO: Added Due to: https://github.com/eclipse/paho.mqtt.android/issues/101
+            } catch (e: Exception) {/*  TODO: Added Due to: https://github.com/eclipse/paho.mqtt.android/issues/101
                     For some reason in a small number of cases, myClient is null here and so
 				    a NullPointer Exception is thrown. This is a workaround to pass the exception
 				    up to the application. myClient should not be null so more investigation is
@@ -798,7 +867,8 @@ internal class MqttConnection(
 				*/
                 service.traceError("Cannot reconnect to remote server." + e.message)
                 setConnectingState(false)
-                val newEx = MqttException(MqttException.REASON_CODE_UNEXPECTED_ERROR.toInt(), e.cause)
+                val newEx =
+                    MqttException(MqttException.REASON_CODE_UNEXPECTED_ERROR.toInt(), e.cause)
                 handleException(resultBundle, newEx)
             }
         }
@@ -837,13 +907,16 @@ internal class MqttConnection(
      *
      * Simply handles the basic success/failure cases for operations which don't return results
      */
-    private open inner class MqttConnectionListener(private val resultBundle: Bundle) : IMqttActionListener {
+    private open inner class MqttConnectionListener(private val resultBundle: Bundle) :
+        IMqttActionListener {
         override fun onSuccess(asyncActionToken: IMqttToken) {
             service.callbackToActivity(clientHandle, Status.OK, resultBundle)
         }
 
         override fun onFailure(asyncActionToken: IMqttToken?, exception: Throwable?) {
-            resultBundle.putString(MqttServiceConstants.CALLBACK_ERROR_MESSAGE, exception?.localizedMessage)
+            resultBundle.putString(
+                MqttServiceConstants.CALLBACK_ERROR_MESSAGE, exception?.localizedMessage
+            )
             resultBundle.putSerializable(MqttServiceConstants.CALLBACK_EXCEPTION, exception)
             service.callbackToActivity(clientHandle, Status.ERROR, resultBundle)
         }

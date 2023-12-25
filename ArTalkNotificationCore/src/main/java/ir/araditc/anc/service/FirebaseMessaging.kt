@@ -3,7 +3,6 @@ package ir.araditc.anc.service
 import android.content.Context
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
-import info.mqtt.android.service.MqttAndroidClient
 import ir.araditc.anc.Arad
 import ir.araditc.anc.data.local.SecureSharedPrefs
 import org.eclipse.paho.client.mqttv3.DisconnectedBufferOptions
@@ -15,12 +14,13 @@ import org.eclipse.paho.client.mqttv3.MqttConnectOptions
 import org.eclipse.paho.client.mqttv3.MqttMessage
 import java.util.UUID
 
-class FirebaseMessagingService : FirebaseMessagingService() {
+class FirebaseMessaging : FirebaseMessagingService() {
 
     private lateinit var mqttAndroidClient: MqttAndroidClient
 
     private var title: String= ""
     private var content: String= ""
+    private var payload: String = ""
 
     companion object {
         const val TAG = "APN"
@@ -29,8 +29,8 @@ class FirebaseMessagingService : FirebaseMessagingService() {
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
         title = remoteMessage.notification?.title.toString()
         content = remoteMessage.notification?.body.toString()
-
-        disconnect()
+        payload = remoteMessage.data.toString()
+        Arad.setMessage(title , content , payload)
     }
 
     override fun onNewToken(token: String) {

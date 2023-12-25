@@ -6,6 +6,7 @@ import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Message
 import android.text.TextUtils
+import android.util.Log
 import com.google.android.gms.tasks.Tasks
 import com.google.firebase.FirebaseApp
 import com.google.firebase.FirebaseOptions
@@ -26,7 +27,6 @@ object Arad {
     private var firebaseApp: FirebaseApp? = null
 
     fun init(context: Context, firebaseConfig: FirebaseConfig) {
-
         val option = FirebaseOptions.Builder().setApiKey(firebaseConfig.ApiKey)
             .setApplicationId(firebaseConfig.ApplicationId).setProjectId(firebaseConfig.ProjectId)
             .build();
@@ -128,7 +128,7 @@ object Arad {
 
     fun setMessage(title: String, content: String, payload: String) {
         if (iMessage != null) {
-            iMessage!!.MessageReceive(title , content , payload)
+            iMessage!!.MessageReceive(title, content, payload)
         }
     }
 
