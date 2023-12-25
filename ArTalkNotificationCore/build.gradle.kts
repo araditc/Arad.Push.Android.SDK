@@ -7,7 +7,7 @@ plugins {
 }
 
 android {
-    namespace = "ir.araditc.anc"
+    namespace = "com.araditc.anc"
     compileSdk = 34
 
     defaultConfig {

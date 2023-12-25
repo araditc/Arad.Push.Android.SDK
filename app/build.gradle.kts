@@ -4,11 +4,11 @@ plugins {
 }
 
 android {
-    namespace = "ir.araditc.ane"
+    namespace = "com.araditc.ane"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "ir.araditc.ane"
+        applicationId = "com.araditc.ane"
         minSdk = 21
         targetSdk = 34
         versionCode = 1

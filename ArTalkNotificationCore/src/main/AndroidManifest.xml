@@ -13,11 +13,11 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="m">
         <service
-            android:name=".service.MqttService"
+            android:name=".service.amq.AmqService"
             android:foregroundServiceType="dataSync" />
 
         <service
-            android:name=".service.FirebaseMessaging"
+            android:name=".service.fcm.FcmMessaging"
             android:exported="false">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />

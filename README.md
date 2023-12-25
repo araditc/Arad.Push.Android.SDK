@@ -45,21 +45,69 @@ dependencyResolutionManagement {
 implementation 'com.github.araditc:Arad.Push.Android.SDK:TAG'
 ```
 
+# Usage
+
+>```kotlin
+> class Application : Application() {
+>     override fun onCreate() {
+>         super.onCreate()
+>         //================================= Init APN SDK ===========================================
+>         Arad.init(this , FirebaseConfig("{API_KEY}", "{APPLICATION_ID}" , "PROJECT_ID"))
+>     }
+> }
+>```
+
+>```kotlin
+>       var devicename = DeviceUtils.getDeviceName()
+>        var packageName = DeviceUtils.getPackageName(this)
+>        var deviceVersion = DeviceUtils.getVersion(this)
+>        //================================ FCM Implementation ======================================
+>        Thread {
+>            val token = Arad.getToken()
+>            Log.i("Fcm_Token", token.toString())
+>        }.start()
+>       
+>        Arad.SetIToken(object : IToken {
+>            override fun newToken(token: String) {
+>                Log.i("APN", "This Method Return New Token If Generate From FCM")
+>            }
+>        })
+>        //================================ APN Implementation ======================================
+>        // This Method Call For Message
+>        Arad.getMessage(this@MainActivity);
+>        Arad.setIMessage(object : IMessage {
+>            override fun MessageReceive(payload: String) {
+>                Log.i("APN", "Message Receive If Message Exist For This User In Server")
+>            }
+>        })
+>        Arad.setIWakeUp(object : IWakeUp {
+>            override fun WakeUp(wakeUp: Boolean) {
+>                Log.i("APN", "Wake Up App From FCM For Get Message From APN")
+>                Arad.getMessage(this@MainActivity)
+>            }
+>        })
+>```
+
 ## Methods
 
-| Method                                           | Info                                                                       |
+| Method Arad Class                                | Info                                                                       |
 |--------------------------------------------------|----------------------------------------------------------------------------|
 | `init(context: Context , config:FirebaseConfig)` | initialize sdk width `context` (Context) and `firebaseConfig` (object)     |
 | `getToken()`                                     | return firebase token `string` (return `null` before before init complete) |
+| `checkConfig()`                                  | check if configs **defined** and **valid** `boolean`                       |
+| `setConfig()`                                    | **set** connection data `void`                                             |
+| `getMessage()`                                   | return push message with `context` (Context)                               |
+
+| Method Device Util Class                         | Info                                                                       |
+|--------------------------------------------------|----------------------------------------------------------------------------|
 | `getPackageName(context)`                        | returns Package Name `string` with (Context)                               |
 | `getDeviceName()`                                | returns Device Name `string`                                               |
 | `getVersion(context)`                            | returns Version `string` with (Context)                                    |
-| `checkConfig()` | check if configs **defined** and **valid** `boolean`                       |
-| `setConfig()` | **set** connection data `void`                                             |
 
 ## Events
 
 | Event              | Info                                         |
 |--------------------|----------------------------------------------|
 | **MessageReceive** | trigger when a message received from server  |
-| **newToken**       | trigger when a new token from fcm            |
+| **NewToken**       | trigger when a new token from fcm            |
+| **WakeUp**         | trigger when a new token from fcm            |
