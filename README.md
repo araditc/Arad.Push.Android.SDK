@@ -58,34 +58,34 @@ implementation 'com.github.araditc:Arad.Push.Android.SDK:TAG'
 >```
 
 >```kotlin
->       var devicename = DeviceUtils.getDeviceName()
->       var packageName = DeviceUtils.getPackageName(this)
->       var deviceVersion = DeviceUtils.getVersion(this)
->       //================================ FCM Implementation ======================================
->       Thread {
->           val token = Arad.getToken()
->           Log.i("Fcm_Token", token.toString())
->       }.start()
->       
->       Arad.SetIToken(object : IToken {
->           override fun newToken(token: String) {
->               Log.i("APN", "This Method Return New Token If Generate From FCM")
->           }
->       })
->       //================================ APN Implementation ======================================
->       // This Method Call For Message
->       Arad.getMessage(this@MainActivity)
->       Arad.setIMessage(object : IMessage {
->           override fun MessageReceive(payload: String) {
->               Log.i("APN", "Message Receive If Message Exist For This User In Server")
->           }
->       })
->       Arad.setIWakeUp(object : IWakeUp {
->           override fun WakeUp(wakeUp: Boolean) {
->               Log.i("APN", "Wake Up App From FCM For Get Message From APN")
->               Arad.getMessage(this@MainActivity)
->            }
->        })
+> var devicename = DeviceUtils.getDeviceName()
+> var packageName = DeviceUtils.getPackageName(this)
+> var deviceVersion = DeviceUtils.getVersion(this)
+> //================================ FCM Implementation ======================================
+> Thread {
+>     val token = Arad.getToken()
+>     Log.i("Fcm_Token", token.toString())
+> }.start()
+> 
+> Arad.SetIToken(object : IToken {
+>     override fun newToken(token: String) {
+>         Log.i("APN", "This Method Return New Token If Generate From FCM")
+>     }
+> })
+> //================================ APN Implementation ======================================
+> // This Method Call For Message
+> Arad.getMessage(this@MainActivity)
+> Arad.setIMessage(object : IMessage {
+>     override fun MessageReceive(payload: String) {
+>         Log.i("APN", "Message Receive If Message Exist For This User In Server")
+>     }
+> })
+> Arad.setIWakeUp(object : IWakeUp {
+>     override fun WakeUp(wakeUp: Boolean) {
+>         Log.i("APN", "Wake Up App From FCM For Get Message From APN")
+>         Arad.getMessage(this@MainActivity)
+>      }
+>  })
 >```
 
 ## Methods
