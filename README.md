@@ -52,7 +52,7 @@ implementation 'com.github.araditc:Arad.Push.Android.SDK:TAG'
 >     override fun onCreate() {
 >         super.onCreate()
 >         //================================= Init APN SDK ===========================================
->         Arad.init(this , FirebaseConfig("{API_KEY}", "{APPLICATION_ID}" , "PROJECT_ID"))
+>         Arad.init(this , FirebaseConfig("{API_KEY}", "{APPLICATION_ID}" , "{PROJECT_ID}"))
 >     }
 > }
 >```
