@@ -59,31 +59,31 @@ implementation 'com.github.araditc:Arad.Push.Android.SDK:TAG'
 
 >```kotlin
 >       var devicename = DeviceUtils.getDeviceName()
->        var packageName = DeviceUtils.getPackageName(this)
->        var deviceVersion = DeviceUtils.getVersion(this)
->        //================================ FCM Implementation ======================================
->        Thread {
->            val token = Arad.getToken()
->            Log.i("Fcm_Token", token.toString())
->        }.start()
+>       var packageName = DeviceUtils.getPackageName(this)
+>       var deviceVersion = DeviceUtils.getVersion(this)
+>       //================================ FCM Implementation ======================================
+>       Thread {
+>           val token = Arad.getToken()
+>           Log.i("Fcm_Token", token.toString())
+>       }.start()
 >       
->        Arad.SetIToken(object : IToken {
->            override fun newToken(token: String) {
->                Log.i("APN", "This Method Return New Token If Generate From FCM")
->            }
->        })
->        //================================ APN Implementation ======================================
->        // This Method Call For Message
->        Arad.getMessage(this@MainActivity);
->        Arad.setIMessage(object : IMessage {
->            override fun MessageReceive(payload: String) {
->                Log.i("APN", "Message Receive If Message Exist For This User In Server")
->            }
->        })
->        Arad.setIWakeUp(object : IWakeUp {
->            override fun WakeUp(wakeUp: Boolean) {
->                Log.i("APN", "Wake Up App From FCM For Get Message From APN")
->                Arad.getMessage(this@MainActivity)
+>       Arad.SetIToken(object : IToken {
+>           override fun newToken(token: String) {
+>               Log.i("APN", "This Method Return New Token If Generate From FCM")
+>           }
+>       })
+>       //================================ APN Implementation ======================================
+>       // This Method Call For Message
+>       Arad.getMessage(this@MainActivity)
+>       Arad.setIMessage(object : IMessage {
+>           override fun MessageReceive(payload: String) {
+>               Log.i("APN", "Message Receive If Message Exist For This User In Server")
+>           }
+>       })
+>       Arad.setIWakeUp(object : IWakeUp {
+>           override fun WakeUp(wakeUp: Boolean) {
+>               Log.i("APN", "Wake Up App From FCM For Get Message From APN")
+>               Arad.getMessage(this@MainActivity)
 >            }
 >        })
 >```
@@ -106,8 +106,8 @@ implementation 'com.github.araditc:Arad.Push.Android.SDK:TAG'
 
 ## Events
 
-| Event              | Info                                         |
-|--------------------|----------------------------------------------|
-| **MessageReceive** | trigger when a message received from server  |
-| **NewToken**       | trigger when a new token from fcm            |
-| **WakeUp**         | trigger when a new token from fcm            |
+| Event              | Info                                        |
+|--------------------|---------------------------------------------|
+| **MessageReceive** | trigger when a message received from server |
+| **NewToken**       | trigger when a new token from fcm           |
+| **WakeUp**         | trigger when a new message from fcm         |

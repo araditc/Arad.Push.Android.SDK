@@ -52,7 +52,7 @@ publishing {
         register<MavenPublication>("release") {
             groupId = "com.github.araditc"
             artifactId = "push-notification-sdk"
-            version = "1.0"
+            version = "1.2.1"
 
             afterEvaluate {
                 from(components["release"])
