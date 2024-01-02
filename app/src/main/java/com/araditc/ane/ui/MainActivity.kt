@@ -18,6 +18,7 @@ class MainActivity : ComponentActivity() {
         var packageName = DeviceUtils.getPackageName(this)
         var deviceVersion = DeviceUtils.getVersion(this)
         //================================ FCM Implementation ======================================
+
         Thread {
             val token = Arad.getToken()
             Log.i("Fcm_Token", token.toString())
@@ -28,9 +29,12 @@ class MainActivity : ComponentActivity() {
                 Log.i("APN", "This Method Return New Token If Generate From FCM")
             }
         })
+
         //================================ APN Implementation ======================================
+
         // This Method Call For Message
-//        Arad.getMessage(this@MainActivity);
+        Arad.setConfig(this , "{USERNAME}" , "{PASSWORD}" , "{URL}")
+        Arad.getMessage(this@MainActivity);
         Arad.setIMessage(object : IMessage {
             override fun MessageReceive(payload: String) {
                 Log.i("APN", "Message Receive If Message Exist For This User In Server")

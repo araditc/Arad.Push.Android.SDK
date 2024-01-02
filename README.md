@@ -74,6 +74,7 @@ implementation 'com.github.araditc:Arad.Push.Android.SDK:TAG'
 > })
 > //================================ APN Implementation ======================================
 > // This Method Call For Message
+> Arad.setConfig(this , "{USERNAME}" , "{PASSWORD}" , "{URL}")
 > Arad.getMessage(this@MainActivity)
 > Arad.setIMessage(object : IMessage {
 >     override fun MessageReceive(payload: String) {

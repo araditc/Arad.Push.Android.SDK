@@ -124,7 +124,7 @@ object Arad {
             }
 
             override fun messageArrived(topic: String, message: MqttMessage) {
-                setMessage(message.payload.toString())
+                setMessage(message.payload.toString(Charsets.UTF_8))
             }
 
             override fun deliveryComplete(token: IMqttDeliveryToken) {
