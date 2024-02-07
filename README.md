@@ -58,7 +58,7 @@ implementation 'com.github.araditc:Arad.Push.Android.SDK:TAG'
 >```
 
 >```kotlin
-> var devicename = DeviceUtils.getDeviceName()
+> var deviceName = DeviceUtils.getDeviceName()
 > var packageName = DeviceUtils.getPackageName(this)
 > var deviceVersion = DeviceUtils.getVersion(this)
 > //================================ FCM Implementation ======================================

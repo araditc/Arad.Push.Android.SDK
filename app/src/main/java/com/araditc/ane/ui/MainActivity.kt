@@ -14,7 +14,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         //================================= Device Util ============================================
-        var devicename = DeviceUtils.getDeviceName()
+        var deviceName = DeviceUtils.getDeviceName()
         var packageName = DeviceUtils.getPackageName(this)
         var deviceVersion = DeviceUtils.getVersion(this)
         //================================ FCM Implementation ======================================
@@ -37,7 +37,7 @@ class MainActivity : ComponentActivity() {
         Arad.getMessage(this@MainActivity);
         Arad.setIMessage(object : IMessage {
             override fun MessageReceive(payload: String) {
-                Log.i("APN", "Message Receive If Message Exist For This User In Server")
+                Log.i("APN", "Message Receive If Message Exist For This User In Server $payload")
             }
         })
         Arad.setIWakeUp(object : IWakeUp {

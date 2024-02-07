@@ -2,6 +2,7 @@ package com.araditc.anc
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.os.Handler
 import com.araditc.anc.data.local.IMessage
 import com.google.android.gms.tasks.Tasks
 import com.google.firebase.FirebaseApp
@@ -92,7 +93,7 @@ object Arad {
         val editor = sharedPreferences.edit()
         editor.putString("clientUserName", clientUserName)
         editor.putString("clientPassword", clientPassword)
-        editor.putString("connectionURL", "tcp://$connectionURL:1883")
+        editor.putString("connectionURL", "tcp://$connectionURL")
         editor.apply()
     }
 
@@ -125,6 +126,7 @@ object Arad {
 
             override fun messageArrived(topic: String, message: MqttMessage) {
                 setMessage(message.payload.toString(Charsets.UTF_8))
+                disconnectBroker()
             }
 
             override fun deliveryComplete(token: IMqttDeliveryToken) {
@@ -156,7 +158,7 @@ object Arad {
     }
 
     private fun subscribeToTopicBroker(topic: String) {
-        broker.subscribe(topic, 0, null, object : IMqttActionListener {
+        broker.subscribe(topic, 1, null, object : IMqttActionListener {
             override fun onSuccess(asyncActionToken: IMqttToken?) {
             }
 
