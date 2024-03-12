@@ -57,7 +57,7 @@ object Arad {
         return try {
             Tasks.await(tokenTask)
         } catch (e: ExecutionException) {
-            throw tokenTask.exception!!
+            return null
         }
     }
 
